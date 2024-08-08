@@ -71,8 +71,6 @@ public class Tile {
             };
         }
 
-
-        
         //note to myself: now if the value in null it'ii create a bag, othewise it return the existing bag
         public static Bag getBag() {
             if (bag == null) {
@@ -103,10 +101,10 @@ public class Tile {
             //  יצירת מספרים אקראיים: מחלקת Random מספקת את השיטה nextInt(int bound), 
             //  שמחזירה מספר אקראי בטווח של 0 עד bound - 1.
             //  זה שימושי במקרה הזה כדי לבחור אקראית אינדקס מתוך רשימה של אינדקסים תקפים.
-
+            
              Random rand = new Random();  // Initialize Random object
              int randIndex = validIndexes[rand.nextInt(index)];
-
+             quantity[randIndex]--;
             
              return tiles[randIndex];
             
