@@ -1,4 +1,6 @@
 package test;
+import java.util.Random;
+
 
 import java.util.Objects;
 
@@ -31,12 +33,14 @@ public class Tile {
     public static class Bag
     {
         int [] quantity;
+        int [] originalQuantity;
         Tile [] tiles;
         private static Bag bag= null;
 
         private Bag()
         {
             this.quantity= new int []{9,2,2,4,12,2,3,2,9,1,1,4,2,6,8,2,1,6,4,6,6,2,2,1,2,1};
+            this.originalQuantity = this.quantity.clone();
             this.tiles= new Tile[]{
                     new Tile('A', 1),
                     new Tile('B', 3),
@@ -66,6 +70,8 @@ public class Tile {
                     new Tile('Z', 10)
             };
         }
+
+
         
         //note to myself: now if the value in null it'ii create a bag, othewise it return the existing bag
         public static Bag getBag() {
@@ -74,6 +80,38 @@ public class Tile {
             }
             return bag;
         }
+
+        public Tile getRand()
+        {
+            int sum=0;
+            int[] validIndexes = new int[tiles.length];
+            int index=0;
+            for (int i=0; i< quantity.length; i++)
+            {
+                  // note: Find all indexes with non-zero quantities
+                if (quantity[i] > 0) {
+                    validIndexes[index++] = i;
+                }
+                sum+=quantity[i];
+            }
+            if(sum==0)
+                {
+                    return null;
+                }
+
+             // Choose a random valid index
+            //  יצירת מספרים אקראיים: מחלקת Random מספקת את השיטה nextInt(int bound), 
+            //  שמחזירה מספר אקראי בטווח של 0 עד bound - 1.
+            //  זה שימושי במקרה הזה כדי לבחור אקראית אינדקס מתוך רשימה של אינדקסים תקפים.
+
+             Random rand = new Random();  // Initialize Random object
+             int randIndex = validIndexes[rand.nextInt(index)];
+
+            
+             return tiles[randIndex];
+            
+        }
+
     }
 	
 }
