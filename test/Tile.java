@@ -1,8 +1,9 @@
 package test;
-import java.util.Random;
+
 
 
 import java.util.Objects;
+import java.util.Random;
 
 public class Tile {
     public final char letter;
