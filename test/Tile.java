@@ -115,6 +115,8 @@ public class Tile {
             if(t>='A'&& t<='Z')
             {
                 int num= t-'A';
+                if(size()<=0)
+                    return null;
                 if(this.quantity[num]>0)
                 {
                     this.quantity[num]--;
