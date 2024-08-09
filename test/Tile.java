@@ -107,9 +107,49 @@ public class Tile {
              quantity[randIndex]--;
             
              return tiles[randIndex];
-            
         }
 
+        public Tile getTile(char t)
+        {
+            if(t>='A'&& t<='Z')
+            {
+                int num= t-'A';
+                if(this.quantity[num]>0)
+                {
+                    this.quantity[num]--;
+                    return tiles[num];
+                }
+               return null;
+
+            }
+            return null;
+        }
+
+        public int size()
+        {
+            int size=0;
+            for(int i=0; i< quantity.length; i++)
+            {
+                size+= quantity[i];
+            }
+            return size;
+        }
+
+        public void put(Tile t)
+        {
+            char c= t.letter;
+            int num= c-'A';
+            if(this.originalQuantity[num]>this.quantity[num])
+            {
+                this.quantity[num]++;
+            }
+        }
+        public int[] getQuantities()
+        {
+            return this.quantity.clone();
+        }
     }
 	
 }
+
+
