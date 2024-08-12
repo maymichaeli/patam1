@@ -84,9 +84,29 @@ public class Board {
         this.score[9][5]="blue";
     }
 
+    //singleton
     public static Board getBoard()
     {
-        
+        if (board == null)
+            board = new Board();
+        return board;
     }
+    //need to return copy of tiles
+    public Tile [][] getTile()
+    {
+        return this.boardTiles.clone();
+    }
+    // מתלבטת אם העתקה שטוחה או עמוקה
+
+    //  // Return a copy of the tiles array
+    //  public Tile[][] getTiles() {
+    //     Tile[][] tilesCopy = new Tile[size][size];
+    //     for (int i = 0; i < size; i++) {
+    //         for (int j = 0; j < size; j++) {
+    //             tilesCopy[i][j] = this.boardTiles[i][j]; // Copy each tile reference
+    //         }
+    //     }
+    //     return tilesCopy;
+    // }
 
 }
