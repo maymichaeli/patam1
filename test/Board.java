@@ -1,6 +1,8 @@
 package test;
 
 import test.Tile.Bag;
+import java.util.ArrayList;
+
 
 public class Board {
     Tile [][] boardTiles;
@@ -195,10 +197,131 @@ public class Board {
         return true;
     }
     
-    
     public boolean dictionaryLegal(Word w) //need to chaeck if the word exist in dictionary
     {
         return true; 
     }
 
+    public ArrayList<Word> getWords(Word w) {
+        ArrayList<Word> words = new ArrayList<>();
+        Tile[] tiles = w.getTiles();
+        int row = w.getRow();
+        int col = w.getCol();
+
+        // Add the original word
+        words.add(w);
+
+        // Check for new words created horizontally
+        if (!w.isVertical()) {
+            for (int i = 0; i < tiles.length; i++) {
+                int r = row;
+                int c = col + i;
+                
+                // Check above and below for vertical words
+                if (r > 0 && boardTiles[r - 1][c] != null || r < size - 1 && boardTiles[r + 1][c] != null) {
+                    int startRow = r;
+                    int endRow = r;
+                    
+                    // Find the start of the word
+                    while (startRow > 0 && boardTiles[startRow - 1][c] != null) {
+                        startRow--;
+                    }
+                    
+                    // Find the end of the word
+                    while (endRow < size - 1 && boardTiles[endRow + 1][c] != null) {
+                        endRow++;
+                    }
+                    
+                    // Collect the tiles and form the word
+                    Tile[] wordTiles = new Tile[endRow - startRow + 1];
+                    for (int j = startRow; j <= endRow; j++) {
+                        wordTiles[j - startRow] = boardTiles[j][c];
+                    }
+                    
+                    words.add(new Word(wordTiles, startRow, c, true));
+                }
+            }
+        }
+        // Check for new words created vertically
+        else {
+            for (int i = 0; i < tiles.length; i++) {
+                int r = row + i;
+                int c = col;
+                
+                // Check left and right for horizontal words
+                if (c > 0 && boardTiles[r][c - 1] != null || c < size - 1 && boardTiles[r][c + 1] != null) {
+                    int startCol = c;
+                    int endCol = c;
+                    
+                    // Find the start of the word
+                    while (startCol > 0 && boardTiles[r][startCol - 1] != null) {
+                        startCol--;
+                    }
+                    
+                    // Find the end of the word
+                    while (endCol < size - 1 && boardTiles[r][endCol + 1] != null) {
+                        endCol++;
+                    }
+                    
+                    // Collect the tiles and form the word
+                    Tile[] wordTiles = new Tile[endCol - startCol + 1];
+                    for (int j = startCol; j <= endCol; j++) {
+                        wordTiles[j - startCol] = boardTiles[r][j];
+                    }
+                    
+                    words.add(new Word(wordTiles, r, startCol, false));
+                }
+            }
+        }
+        return words;
+    }
+
+    
+    public int getScore(Word w, Board board) {
+        int score = 0;
+        int multiplier = 1; // Multiplier for the word score based on bonuses
+    
+        // Iterate through each tile in the word
+        for (int i = 0; i < w.getTiles().length; i++) {
+            Tile tile = w.getTiles()[i];
+            int row = w.getRow();
+            int col = w.getCol();
+    
+            // Get the position of the tile on the board
+            int r = w.isVertical() ? row + i : row;
+            int c = w.isVertical() ? col : col + i;
+    
+            // Add the tile's score
+            score += tile.score;
+    
+            // Check for bonuses at the current position
+            String bonus = board.score[r][c];
+            if (bonus != null) {
+                switch (bonus) {
+                    case "Yellow":
+                        // Double word score
+                        multiplier *= 2;
+                        break;
+                    case "Red":
+                        // Triple word score
+                        multiplier *= 3;
+                        break;
+                    case "lightBlue":
+                        // Double letter score
+                        score += tile.score;
+                        break;
+                    case "blue":
+                        // Triple letter score
+                        score += 2 * tile.score;
+                        break;
+                }
+            }
+        }
+    
+        // Apply the word multiplier
+        score *= multiplier;
+    
+        return score;
+    }
+    
 }
