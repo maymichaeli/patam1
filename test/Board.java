@@ -123,7 +123,7 @@ public class Board {
         }
     }
 
-    // בודק אם המילה נשענת על אריחים קיימים על הלוח
+    //check if the word touching existing tile
     private boolean isTouchingExistingTile(Word w) {
         int row = w.getRow();
         int col = w.getCol();
@@ -137,7 +137,7 @@ public class Board {
                 return true;
             }
 
-            // בדיקה אם יש אריח סמוך
+            //check if there is a close tile
             if (r > 0 && boardTiles[r - 1][c] != null) return true;
             if (r < size - 1 && boardTiles[r + 1][c] != null) return true;
             if (c > 0 && boardTiles[r][c - 1] != null) return true;
@@ -164,14 +164,41 @@ public class Board {
         return true;
     }
 
+    private boolean isTouchingCenter(Word w) {
+        int row = w.getRow();
+        int col = w.getCol();
+        Tile[] tiles = w.getTiles();
+    
+        for (int i = 0; i < tiles.length; i++) {
+            int r = w.isVertical() ? row + i : row;
+            int c = w.isVertical() ? col : col + i;
+    
+            if (r == 7 && c == 7) {
+                return true;
+            }
+        }
+    
+        return false;
+    }
+
     public boolean boardLegal(Word w) {
         if (!isWithinBounds(w)) return false;
-        if (numOfTiles == 0 && (w.getRow() != 7 || w.getCol() != 7)) return false;
+        
+        //if this is the first word and its on the center index
+        if (numOfTiles == 0 && !isTouchingCenter(w)) {
+            return false;
+        }
+    
         if (!doesNotReplaceExistingTiles(w)) return false;
         if (numOfTiles > 0 && !isTouchingExistingTile(w)) return false;
-
+    
         return true;
     }
     
+    
+    public boolean dictionaryLegal(Word w) //need to chaeck if the word exist in dictionary
+    {
+        return true; 
+    }
 
 }
