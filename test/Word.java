@@ -3,12 +3,12 @@ package test;
 import java.util.Objects;
 
 public class Word {
-    Tile tiles;
+    Tile[] tiles;
     int row;
     int col;
     boolean vertical; //if vertical it true else false
 	
-    private Word( Tile tiles, int row, int col, boolean vertical)
+    public Word( Tile[] tiles, int row, int col, boolean vertical)
     {
         this.tiles=tiles;
         this.col= col;
@@ -16,7 +16,7 @@ public class Word {
         this.vertical= vertical;
     }
 
-    public Tile getTiles()
+    public Tile[] getTiles()
     {
         return this.tiles;
     }
@@ -29,7 +29,7 @@ public class Word {
     {
         return this.row;
     }
-    public boolean getVertical()
+    public boolean isVertical()
     {
         return this.vertical;
     }
