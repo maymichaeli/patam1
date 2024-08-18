@@ -6,6 +6,7 @@ public class Board {
     Tile [][] boardTiles;
     String [][] score;
     int size=15;
+    int numOfTiles=0;
     private static Board board= null;
 
     Board()
@@ -96,6 +97,7 @@ public class Board {
     {
         return this.boardTiles.clone();
     }
+
     // מתלבטת אם העתקה שטוחה או עמוקה
 
     //  // Return a copy of the tiles array
@@ -108,5 +110,68 @@ public class Board {
     //     }
     //     return tilesCopy;
     // }
+    
+    private boolean isWithinBounds(Word w) {
+        int row = w.getRow();
+        int col = w.getCol();
+        int length = w.getTiles().length;
+
+        if (w.isVertical()) {
+            return row >= 0 && row + length <= size && col >= 0 && col < size;
+        } else {
+            return col >= 0 && col + length <= size && row >= 0 && row < size;
+        }
+    }
+
+    // בודק אם המילה נשענת על אריחים קיימים על הלוח
+    private boolean isTouchingExistingTile(Word w) {
+        int row = w.getRow();
+        int col = w.getCol();
+        Tile[] tiles = w.getTiles();
+
+        for (int i = 0; i < tiles.length; i++) {
+            int r = w.isVertical() ? row + i : row;
+            int c = w.isVertical() ? col : col + i;
+
+            if (boardTiles[r][c] != null) {
+                return true;
+            }
+
+            // בדיקה אם יש אריח סמוך
+            if (r > 0 && boardTiles[r - 1][c] != null) return true;
+            if (r < size - 1 && boardTiles[r + 1][c] != null) return true;
+            if (c > 0 && boardTiles[r][c - 1] != null) return true;
+            if (c < size - 1 && boardTiles[r][c + 1] != null) return true;
+        }
+
+        return false;
+    }
+
+    private boolean doesNotReplaceExistingTiles(Word w) {
+        int row = w.getRow();
+        int col = w.getCol();
+        Tile[] tiles = w.getTiles();
+
+        for (int i = 0; i < tiles.length; i++) {
+            int r = w.isVertical() ? row + i : row;
+            int c = w.isVertical() ? col : col + i;
+
+            if (boardTiles[r][c] != null && !boardTiles[r][c].equals(tiles[i])) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public boolean boardLegal(Word w) {
+        if (!isWithinBounds(w)) return false;
+        if (numOfTiles == 0 && (w.getRow() != 7 || w.getCol() != 7)) return false;
+        if (!doesNotReplaceExistingTiles(w)) return false;
+        if (numOfTiles > 0 && !isTouchingExistingTile(w)) return false;
+
+        return true;
+    }
+    
 
 }
