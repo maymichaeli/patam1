@@ -1,5 +1,6 @@
 package test;
 
+import java.util.Arrays;
 import java.util.Objects;
 
 public class Word {
@@ -41,5 +42,25 @@ public class Word {
         Word word = (Word) o;
         return row == word.row && col == word.col && vertical == word.vertical && Objects.equals(tiles, word.tiles);
     }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(row, col, vertical, Arrays.hashCode(tiles));
+    }
+    
+    @Override
+    public String toString()
+    {
+        String s = "";
+        for(Tile t: tiles)
+        {
+            if(t== null)
+                s+="_";
+            else 
+                s+= t.letter;
+        }
+        return s;
+    }
+
 
 }
