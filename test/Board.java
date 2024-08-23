@@ -825,14 +825,14 @@ public int tryPlaceWord(Word w) {
     ArrayList<Word> newWords = getWords(w);
     int totalScore = 0;
     
-    System.out.println("The score of the word is: " + getScore(w, this));
+    //System.out.println("The score of the word is: " + getScore(w, this));
     
     for (Word newWord : newWords) {
         totalScore += getScore(newWord, this);
     }
 
     // Print the total score for debugging purposes
-    System.out.println("The score for the word and new words created is: " + totalScore);
+    //System.out.println("The score for the word and new words created is: " + totalScore);
 
     // Place the word on the board and calculate the total score
 
