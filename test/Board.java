@@ -229,13 +229,101 @@ public boolean dictionaryLegal(Word w) //need to chaeck if the word exist in dic
     return true; 
 }
 
+// public ArrayList<Word> getWords(Word w) {
+//     ArrayList<Word> words = new ArrayList<>();
+//     Tile[] tiles = w.getTiles();
+//     int row = w.getRow();
+//     int col = w.getCol();
+
+//     // Add the original word with filled tiles
+//     Tile[] filledTiles = new Tile[tiles.length];
+//     for (int i = 0; i < tiles.length; i++) {
+//         int r = w.isVertical() ? row + i : row;
+//         int c = w.isVertical() ? col : col + i;
+//         filledTiles[i] = (tiles[i] == null) ? boardTiles[r][c] : tiles[i];
+//     }
+//     Word originalWord = new Word(filledTiles, row, col, w.isVertical());
+//     // Add the original word to the list if it does not exist in the set
+//     if (!containsWord(wordsOnBoard, originalWord)) {
+//         words.add(originalWord);
+//         wordsOnBoard.add(originalWord);
+//     }
+
+//     // Check for new words created horizontally and vertically
+//     for (int i = 0; i < tiles.length; i++) {
+//         int r = w.isVertical() ? row + i : row;
+//         int c = w.isVertical() ? col : col + i;
+
+//         if (tiles[i] == null && boardTiles[r][c] == null) {
+//             continue;
+//         }
+
+//         if (!w.isVertical()) {
+//             if ((r > 0 && boardTiles[r - 1][c] != null) || (r < size - 1 && boardTiles[r + 1][c] != null)) {
+//                 int startRow = r;
+//                 int endRow = r;
+
+//                 while (startRow > 0 && boardTiles[startRow - 1][c] != null) {
+//                     startRow--;
+//                 }
+//                 while (endRow < size - 1 && boardTiles[endRow + 1][c] != null) {
+//                     endRow++;
+//                 }
+
+//                 if (endRow - startRow > 0) {
+//                     Tile[] wordTiles = new Tile[endRow - startRow + 1];
+//                     for (int j = startRow; j <= endRow; j++) {
+//                         wordTiles[j - startRow] = boardTiles[j][c];
+//                     }
+//                     Word word = new Word(wordTiles, startRow, c, true);
+//                     if (!containsWord(wordsOnBoard, word)) {
+//                         words.add(word);
+//                     }
+//                 }
+//             }
+//         } else {
+//             if ((c > 0 && boardTiles[r][c - 1] != null) || (c < size - 1 && boardTiles[r][c + 1] != null)) {
+//                 int startCol = c;
+//                 int endCol = c;
+
+//                 while (startCol > 0 && boardTiles[r][startCol - 1] != null) {
+//                     startCol--;
+//                 }
+//                 while (endCol < size - 1 && boardTiles[r][endCol + 1] != null) {
+//                     endCol++;
+//                 }
+
+//                 if (endCol - startCol > 0) {
+//                     Tile[] wordTiles = new Tile[endCol - startCol + 1];
+//                     for (int j = startCol; j <= endCol; j++) {
+//                         wordTiles[j - startCol] = boardTiles[r][j];
+//                     }
+//                     Word word = new Word(wordTiles, r, startCol, false);
+//                     if (!containsWord(wordsOnBoard, word)) {
+//                         words.add(word);
+//                     }
+//                 }
+//             }
+//         }
+//     }
+//     // Add all the newly found words to the set
+//     wordsOnBoard.addAll(words);
+//     return words;
+// }
+
 public ArrayList<Word> getWords(Word w) {
     ArrayList<Word> words = new ArrayList<>();
     Tile[] tiles = w.getTiles();
     int row = w.getRow();
     int col = w.getCol();
 
-    // Add the original word with filled tiles
+    // שמירה על מצב הלוח הנוכחי במערך זמני
+    Tile[][] tempboard = new Tile[size][size];
+    for (int i = 0; i < size; i++) {
+        System.arraycopy(boardTiles[i], 0, tempboard[i], 0, size);
+    }
+
+    // הוספת המילה המקורית עם טילים מלאים
     Tile[] filledTiles = new Tile[tiles.length];
     for (int i = 0; i < tiles.length; i++) {
         int r = w.isVertical() ? row + i : row;
@@ -243,13 +331,19 @@ public ArrayList<Word> getWords(Word w) {
         filledTiles[i] = (tiles[i] == null) ? boardTiles[r][c] : tiles[i];
     }
     Word originalWord = new Word(filledTiles, row, col, w.isVertical());
-    // Add the original word to the list if it does not exist in the set
+
+    // הוספת המילה המקורית לרשימה וללוח
     if (!containsWord(wordsOnBoard, originalWord)) {
         words.add(originalWord);
-        wordsOnBoard.add(originalWord);
+        // עדכון הלוח הזמני
+        for (int i = 0; i < filledTiles.length; i++) {
+            int r = originalWord.isVertical() ? row + i : row;
+            int c = originalWord.isVertical() ? col : col + i;
+            tempboard[r][c] = filledTiles[i];
+        }
     }
 
-    // Check for new words created horizontally and vertically
+    // בדיקה עבור מילים חדשות שנוצרות בצורה אופקית ואנכית
     for (int i = 0; i < tiles.length; i++) {
         int r = w.isVertical() ? row + i : row;
         int c = w.isVertical() ? col : col + i;
@@ -277,7 +371,11 @@ public ArrayList<Word> getWords(Word w) {
                     }
                     Word word = new Word(wordTiles, startRow, c, true);
                     if (!containsWord(wordsOnBoard, word)) {
-                        words.add(word);
+                        // החלפת ערכים null עם הערכים מהלוח הזמני
+                        Word completeWord = replaceNullsWithTempboard(word, tempboard);
+                        if (!containsWord(wordsOnBoard, completeWord)) {
+                            words.add(completeWord);
+                        }
                     }
                 }
             }
@@ -300,15 +398,36 @@ public ArrayList<Word> getWords(Word w) {
                     }
                     Word word = new Word(wordTiles, r, startCol, false);
                     if (!containsWord(wordsOnBoard, word)) {
-                        words.add(word);
+                        // החלפת ערכים null עם הערכים מהלוח הזמני
+                        Word completeWord = replaceNullsWithTempboard(word, tempboard);
+                        if (!containsWord(wordsOnBoard, completeWord)) {
+                            words.add(completeWord);
+                        }
                     }
                 }
             }
         }
     }
-    // Add all the newly found words to the set
+
+    // הוספת כל המילים החדשות לסט בסוף הבדיקה
     wordsOnBoard.addAll(words);
     return words;
+}
+
+// פונקציה להחלפת ערכים null במילה עם הערכים מהלוח הזמני
+private Word replaceNullsWithTempboard(Word word, Tile[][] tempboard) {
+    Tile[] tiles = word.getTiles();
+    int row = word.getRow();
+    int col = word.getCol();
+    boolean vertical = word.isVertical();
+
+    Tile[] updatedTiles = new Tile[tiles.length];
+    for (int i = 0; i < tiles.length; i++) {
+        int r = vertical ? row + i : row;
+        int c = vertical ? col : col + i;
+        updatedTiles[i] = (tiles[i] == null) ? tempboard[r][c] : tiles[i];
+    }
+    return new Word(updatedTiles, row, col, vertical);
 }
 
 // Helper function to check if a word exists in the set based on deep comparison
@@ -562,58 +681,117 @@ private boolean areWordsEqual(Word w1, Word w2) {
 // }
 
 
+// public int getScore(Word w, Board board) {
+//     int score = 0;
+//     int multiplier = 1; // Multiplier so we need 1
+
+//     int row = w.getRow();
+//     int col = w.getCol();
+
+//     for (int i = 0; i < w.getTiles().length; i++) {
+//         Tile tile = w.getTiles()[i];
+//         int r = w.isVertical() ? row + i : row;
+//         int c = w.isVertical() ? col : col + i;
+
+//         // // Use the existing tile if the current tile is null
+//         // if (tile == null) {
+//         //     tile = board.boardTiles[r][c];
+//         // }
+
+//             // Check if the current position already has a tile on the board
+//         if (board.boardTiles[r][c] != null) {
+//             // Tile is already on the board, add its score only
+//             Tile existingTile = board.boardTiles[r][c];
+//             score += existingTile.score;
+//         } else {
+//             // Tile is new, add score with bonus
+//             if (tile != null) {
+//                 String bonus = board.score[r][c];
+//                 switch (bonus) {
+//                     case "Yellow":
+//                         // Double word score
+//                         multiplier *= 2;
+//                         score += tile.score;
+//                         break;
+//                     case "Red":
+//                         // Triple word score
+//                         multiplier *= 3;
+//                         score += tile.score;
+//                         break;
+//                     case "lightBlue":
+//                         // Double letter score
+//                         score += tile.score * 2;
+//                         break;
+//                     case "blue":
+//                         // Triple letter score
+//                         score += tile.score * 3;
+//                         break;
+//                     default:
+//                         score += tile.score;
+//                         break;
+//                 }
+//             }
+//         }
+//     }
+//     // Apply the word multiplier
+//     score *= multiplier;
+
+//     return score;
+// }
+
 public int getScore(Word w, Board board) {
     int score = 0;
-    int multiplier = 1; // Multiplier so we need 1
+    int multiplier = 1; // Multiplier for the word score based on bonuses
 
-    int row = w.getRow();
-    int col = w.getCol();
-
+    // Iterate through each tile in the word
     for (int i = 0; i < w.getTiles().length; i++) {
         Tile tile = w.getTiles()[i];
+        int row = w.getRow();
+        int col = w.getCol();
+
+        // Get the position of the tile on the board
         int r = w.isVertical() ? row + i : row;
         int c = w.isVertical() ? col : col + i;
 
-        // // Use the existing tile if the current tile is null
-        // if (tile == null) {
-        //     tile = board.boardTiles[r][c];
-        // }
+        // Use the existing tile if the current tile is null
+        if (tile == null) {
+            tile = boardTiles[r][c];
+        }
 
-            // Check if the current position already has a tile on the board
-        if (board.boardTiles[r][c] != null) {
-            // Tile is already on the board, add its score only
-            Tile existingTile = board.boardTiles[r][c];
-            score += existingTile.score;
-        } else {
-            // Tile is new, add score with bonus
-            if (tile != null) {
-                String bonus = board.score[r][c];
-                switch (bonus) {
-                    case "Yellow":
-                        // Double word score
-                        multiplier *= 2;
-                        score += tile.score;
-                        break;
-                    case "Red":
-                        // Triple word score
-                        multiplier *= 3;
-                        score += tile.score;
-                        break;
-                    case "lightBlue":
-                        // Double letter score
-                        score += tile.score * 2;
-                        break;
-                    case "blue":
-                        // Triple letter score
-                        score += tile.score * 3;
-                        break;
-                    default:
-                        score += tile.score;
-                        break;
-                }
+        if (tile == null) {
+            // Handle the case where the tile is still null (shouldn't happen)
+            continue;
+        }
+        // Add the tile's score
+        score += tile.score;
+
+        // Check for bonuses at the current position
+        String bonus = board.score[r][c];
+        if (bonus != null) {
+            if (r == 7 && c == 7 && wordsOnBoard.size()>1) {
+                continue;
+            }
+            switch (bonus) {
+                case "Yellow":
+                    // Double word score
+                    multiplier *= 2;
+                    break;
+                case "Red":
+                    // Triple word score
+                    multiplier *= 3;
+                    break;
+                case "lightBlue":
+                    // Double letter score
+                    score += tile.score;
+                    break;
+                case "blue":
+                    // Triple letter score
+                    score += 2 * tile.score;
+                    break;
             }
         }
     }
+
     // Apply the word multiplier
     score *= multiplier;
 
