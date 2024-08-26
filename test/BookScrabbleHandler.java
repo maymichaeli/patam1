@@ -11,7 +11,7 @@ import java.io.PrintWriter;
 public class BookScrabbleHandler implements ClientHandler {
 
     @Override
-public void handleClient(InputStream inFromClient, OutputStream outToClient) {
+    public void handleClient(InputStream inFromClient, OutputStream outToClient) {
     BufferedReader reader = new BufferedReader(new InputStreamReader(inFromClient));
     PrintWriter writer = new PrintWriter(outToClient, true);
 
@@ -24,7 +24,7 @@ public void handleClient(InputStream inFromClient, OutputStream outToClient) {
         }
 
         // פיצול המחרוזת לשמות ספרים ולשאילתה
-        String[] parts = request.split(",", 2);
+        String[] parts = request.split(",", 2); //מחלק ל2 חלקים, השמות של הקבצים ומה לעשות בכל קובץ
         if (parts.length < 2) {
             writer.println("false");
             return;
