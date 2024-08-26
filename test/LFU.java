@@ -1,10 +1,10 @@
 package test;
 
 
-import java.util.HashMap;
+//import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Objects;
+//import java.util.Objects;
 
 public class LFU implements CacheReplacementPolicy {
 
