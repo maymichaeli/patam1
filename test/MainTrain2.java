@@ -155,8 +155,8 @@ public class MainTrain2 {
 	
 	public static void main(String[] args) {
 		if(testServer()) {
-			testDM();
-			testBSCH();			
+			//testDM();
+			//testBSCH();			
 		}
 		System.out.println("done");
 	}
